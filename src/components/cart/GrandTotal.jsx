@@ -34,7 +34,11 @@ function GrandTotal({ cart }) {
             }}
           >
             <Text strong>
-              ${cart.reduce((acc, curr) => acc + curr.price * curr.quantity, 0)}
+              $
+              {cart.reduce(
+                (acc, curr) => acc + curr.price * curr.quantityInCart,
+                0
+              )}
             </Text>
           </Col>
         </Col>

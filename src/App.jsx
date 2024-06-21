@@ -7,6 +7,8 @@ import NotFound from "./pages/customer/NotFound";
 import AdminLayout from "./layouts/admin/AdminLayout";
 import Login from "./pages/admin/Login";
 import AddProduct from "./pages/admin/AddProduct";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import RejectedRoute from "./utils/RejectedRoute";
 
 function App() {
   return (
@@ -23,9 +25,17 @@ function App() {
 
           {/* Route Admin */}
           <Route path="/admin/" element={<AdminLayout />}>
-            <Route index element={<Login />} />
-            <Route path="login" element={<Login />} />
-            <Route path="add-product" element={<AddProduct />} />
+            <Route element={<RejectedRoute />}>
+              <Route index element={<Login />} />
+            </Route>
+
+            <Route element={<RejectedRoute />}>
+              <Route path="login" element={<Login />} />
+            </Route>
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="add-product" element={<AddProduct />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

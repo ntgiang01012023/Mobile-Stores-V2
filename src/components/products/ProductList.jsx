@@ -9,7 +9,7 @@ function ProductList({
 }) {
   return (
     <>
-      <Row gutter={(16, 16)}>
+      <Row gutter={[16, 16]}>
         {products.map((product) => (
           <ProductCart
             key={product.id}

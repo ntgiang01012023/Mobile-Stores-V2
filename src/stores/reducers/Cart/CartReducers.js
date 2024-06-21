@@ -1,9 +1,12 @@
-import { ACTION_TYPES_CART } from "../../utils/Constants";
+import { ACTION_TYPES_CART } from "../../../utils/Constants";
 
 // Initial state for the cart reducer
 const initialState = {
   list: [],
+  orders: [],
   selectedProduct: null,
+  loading: false,
+  error: null,
 };
 
 const cartReducer = (state = initialState, action) => {
@@ -27,10 +30,10 @@ const cartReducer = (state = initialState, action) => {
         list: existingProduct
           ? state.list.map((product) =>
               product.id === action.payload.id
-                ? { ...product, quantity: product.quantity + 1 }
+                ? { ...product, quantityInCart: product.quantityInCart + 1 }
                 : product
             )
-          : [...state.list, { ...action.payload, quantity: 1 }],
+          : [...state.list, { ...action.payload, quantityInCart: 1 }],
       };
 
     // Removing a product from cart
@@ -48,10 +51,25 @@ const cartReducer = (state = initialState, action) => {
       };
 
     // Checkout cart
-    case ACTION_TYPES_CART.CHECKOUT_CART:
+    case ACTION_TYPES_CART.CHECKOUT_CART_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case ACTION_TYPES_CART.CHECKOUT_CART_SUCCESS:
       return {
         ...state,
         list: [],
+        orders: action.payload,
+        loading: false,
+      };
+
+    case ACTION_TYPES_CART.CHECKOUT_CART_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
       };
 
     // Increasing quantity of a product in cart
@@ -60,7 +78,7 @@ const cartReducer = (state = initialState, action) => {
         ...state,
         list: state.list.map((product) =>
           product.id === action.payload
-            ? { ...product, quantity: product.quantity + 1 }
+            ? { ...product, quantityInCart: product.quantityInCart + 1 }
             : product
         ),
       };
@@ -70,8 +88,8 @@ const cartReducer = (state = initialState, action) => {
       return {
         ...state,
         list: state.list.map((product) =>
-          product.id === action.payload && product.quantity > 1
-            ? { ...product, quantity: product.quantity - 1 }
+          product.id === action.payload && product.quantityInCart > 1
+            ? { ...product, quantityInCart: product.quantityInCart - 1 }
             : product
         ),
       };

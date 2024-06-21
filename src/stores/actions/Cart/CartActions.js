@@ -1,5 +1,5 @@
 // Import action type constants
-import { ACTION_TYPES_CART } from "../../utils/Constants";
+import { ACTION_TYPES_CART } from "../../../utils/Constants";
 
 // Action creators
 // Adding a product to cart
@@ -25,12 +25,6 @@ export const clearCart = () => ({
   type: ACTION_TYPES_CART.CLEAR_CART,
 });
 
-// Checking out cart (initiating checkout process)
-export const checkoutCart = (data) => ({
-  type: ACTION_TYPES_CART.CHECKOUT_CART,
-  payload: data,
-});
-
 // Increasing quantity of a product in cart
 export const increaseProductQuantity = (id) => ({
   type: ACTION_TYPES_CART.INCREASE_PRODUCT_QUANTITY,
@@ -41,4 +35,19 @@ export const increaseProductQuantity = (id) => ({
 export const decreaseProductQuantity = (id) => ({
   type: ACTION_TYPES_CART.DECREASE_PRODUCT_QUANTITY,
   payload: id,
+});
+
+// Checkout cart
+export const checkoutCartRequest = () => ({
+  type: ACTION_TYPES_CART.CHECKOUT_CART_REQUEST,
+});
+
+export const checkoutCartSuccess = (data) => ({
+  type: ACTION_TYPES_CART.CHECKOUT_CART_SUCCESS,
+  payload: data,
+});
+
+export const checkoutCartFailure = (error) => ({
+  type: ACTION_TYPES_CART.CHECKOUT_CART_FAILURE,
+  payload: error,
 });

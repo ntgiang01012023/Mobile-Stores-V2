@@ -1,9 +1,10 @@
 import { Button, Col, Layout, Row, Typography } from "antd";
 import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { APP_ROUTE } from "../../utils/Constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import Cookies from "js-cookie";
 
 // Ant design
 const { Header } = Layout;
@@ -27,6 +28,7 @@ const CustomTitle = styled(Title)`
 
 function HeaderApp() {
   // Constants
+  const navigate = useNavigate();
   const location = useLocation();
   const url = location.pathname;
 
@@ -75,6 +77,11 @@ function HeaderApp() {
       showCartButton = false;
   }
 
+  const handleLogout = () => {
+    Cookies.remove("token");
+    navigate(APP_ROUTE.ADMIN_LOGIN);
+  };
+
   return (
     <>
       <CustomHeader>
@@ -108,8 +115,9 @@ function HeaderApp() {
                   borderRadius: "5px",
                 }}
                 size="large"
+                onClick={handleLogout}
               >
-                <Link to={APP_ROUTE.ADMIN_LOGIN}>logout</Link>
+                logout
               </Button>
             </Col>
           )}

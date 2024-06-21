@@ -1,14 +1,23 @@
-import { Layout, Row, Typography, Button, Modal, Grid } from "antd";
+import {
+  Layout,
+  Row,
+  Typography,
+  Button,
+  Modal,
+  Grid,
+  notification,
+  Spin,
+} from "antd";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  checkoutCart,
   clearCart,
   decreaseProductQuantity,
   increaseProductQuantity,
   removeProductFromCart,
-} from "../../stores/actions/CartActions";
+} from "../../stores/actions/Cart/CartActions";
+import { checkoutCart } from "../../stores/thunks/Cart/CartThunks";
 import {
   faCartShopping,
   faCircleArrowLeft,
@@ -43,6 +52,8 @@ function Cart() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart?.list);
+  const loading = useSelector((state) => state.cart?.loading);
+  // const error = useSelector((state) => state.cart?.error);
 
   // Local state
   const [productIdToRemove, setProductIdToRemove] = useState(null);
@@ -67,9 +78,40 @@ function Cart() {
     setIsClearCartModalOpen(false);
   };
 
-  const handleCheckout = () => {
-    dispatch(checkoutCart());
-    navigate("/");
+  const calculateTotal = (cartItems) => {
+    return cartItems.reduce(
+      (total, item) => total + item.quantity * item.price,
+      0
+    );
+  };
+
+  const handleCheckout = async () => {
+    const checkoutData = {
+      total: calculateTotal(cart),
+      details: cart.map((item) => ({
+        productId: item.id,
+        quantity: item.quantityInCart,
+        unitPrice: item.price,
+      })),
+    };
+
+    try {
+      await dispatch(checkoutCart(checkoutData));
+
+      notification.success({
+        message: "Success",
+        description: "Checkout successfully",
+        duration: 2,
+      });
+
+      navigate("/");
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: error.message,
+        duration: 2,
+      });
+    }
   };
 
   const handleIncreaseQuantity = (productId) => {
@@ -84,40 +126,43 @@ function Cart() {
   const columns = [
     {
       title: "Product",
-      dataIndex: "title",
-      key: "title",
-      render: (text, record) => <Text>{record.title}</Text>,
+      dataIndex: "name",
+      key: "name",
+      render: (text, record) => <Text>{record.name}</Text>,
       width: "40%",
     },
     {
       title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
+      dataIndex: "id",
+      key: "quantityInCart",
       render: (text, record) => (
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Button
-            size="small"
-            onClick={() => handleDecreaseQuantity(record.id)}
-            style={{
-              fontSize: "8px",
-            }}
-            disabled={record.quantity === 1}
-          >
-            <MinusOutlined />
-          </Button>
+        <>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button
+              size="small"
+              onClick={() => handleDecreaseQuantity(record.id)}
+              style={{
+                fontSize: "8px",
+              }}
+              disabled={record.quantityInCart === 1}
+            >
+              <MinusOutlined />
+            </Button>
 
-          <Text style={{ margin: "0 8px" }}>{record.quantity}</Text>
-          <Button
-            size="small"
-            onClick={() => handleIncreaseQuantity(record.id)}
-            style={{
-              fontSize: "8px",
-            }}
-            disabled={record.quantity === record.stock}
-          >
-            <PlusOutlined />
-          </Button>
-        </div>
+            <Text style={{ margin: "0 8px" }}>{record.quantityInCart}</Text>
+
+            <Button
+              size="small"
+              onClick={() => handleIncreaseQuantity(record.id)}
+              style={{
+                fontSize: "8px",
+              }}
+              disabled={record.quantityInCart === record.quantity}
+            >
+              <PlusOutlined />
+            </Button>
+          </div>
+        </>
       ),
       width: "15%",
     },
@@ -132,7 +177,9 @@ function Cart() {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      render: (text, record) => <Text>${record.quantity * record.price}</Text>,
+      render: (text, record) => (
+        <Text>${record.quantityInCart * record.price}</Text>
+      ),
       width: "15%",
     },
     {
@@ -170,6 +217,8 @@ function Cart() {
   return (
     <>
       <CustomContent>
+        {loading && <Spin />}
+
         <Row
           justify="space-between"
           style={{

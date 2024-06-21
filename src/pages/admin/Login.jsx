@@ -1,20 +1,59 @@
 import { useForm, Controller } from "react-hook-form";
-import { Button, Col, Form, Input, Row, Typography } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Spin,
+  Typography,
+  notification,
+} from "antd";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+import Cookies from "js-cookie";
+import { login } from "../../stores/thunks/User/UserThunks";
 
 // Ant design
 const { Title } = Typography;
 
 function Login() {
-  const navigate = useNavigate();
-
   // React hook form
   const { control, handleSubmit } = useForm({});
 
+  // Redux state
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Local state
+  const [loading, setLoading] = useState(false);
+
   // Event Handlers
   const onSubmit = async (data) => {
-    console.log(data);
-    navigate("/admin/add-product");
+    setLoading(true);
+    try {
+      const response = await dispatch(login(data));
+
+      if (response.data) {
+        const token = response.data;
+        Cookies.set("token", token);
+        navigate("/admin/add-product");
+      } else {
+        notification.error({
+          message: "Error Login",
+          description: `${response}`,
+        });
+      }
+    } catch (error) {
+      notification.error({
+        message: "Server Error",
+        description:
+          "Server failed to fulfill a valid request due to an error with server.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,7 +132,6 @@ function Login() {
                   onChange={(e) => {
                     field.onChange(e.target.value.trim());
                   }}
-                  visibilityToggle={false}
                   style={{
                     border: "2px solid var(--color-border)",
                     fontWeight: "500",
@@ -112,6 +150,8 @@ function Login() {
                 color: "var(--color-white)",
                 width: "100%",
               }}
+              icon={loading ? <Spin /> : null}
+              loading={loading}
             >
               Login
             </Button>

@@ -15,8 +15,8 @@ function CartDesktop({ columns, cart }) {
         scroll={{ x: true }}
         summary={(data) => {
           let total = 0;
-          data.forEach(({ price, quantity }) => {
-            total += price * quantity;
+          data.forEach(({ price, quantityInCart }) => {
+            total += price * quantityInCart;
           });
           return (
             <>

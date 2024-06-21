@@ -11,8 +11,8 @@ const { Title } = Typography;
 
 // Styled components
 const CustomImage = styled.img`
-  width: 100%;
-  height: 200px;
+  width: auto;
+  height: 300px;
   object-fit: cover;
 `;
 
@@ -21,22 +21,25 @@ function ProductCart({
   handleNavigateProductDetail,
   handleClickOrderNow,
 }) {
-  const { id, title, thumbnail, description, price, stock } = product;
+  const { id, name, image, description, price, quantity } = product;
+
+  // const renderPlainTextDescription = (html) => {
+  //   const tempElement = document.createElement("div");
+  //   tempElement.innerHTML = html;
+  //   return tempElement.textContent || tempElement.innerText || "";
+  // };
 
   return (
     <>
       <Col key={id} xs={24} sm={12} md={7} lg={6} xl={6} xxl={6}>
-        <Card
-          title={title}
-          hoverable
-          style={{
-            height: "100%",
-          }}
-        >
-          <CustomImage alt={title} src={thumbnail} />
-          <Title level={5}>{description}</Title>
+        <Card title={name} hoverable>
+          <Col style={{ textAlign: "center" }}>
+            <CustomImage alt={name} src={image} />
+          </Col>
+          {/* <Title level={5}>{renderPlainTextDescription(description)}</Title> */}
+
           <Title level={5}>{price} USD</Title>
-          <Title level={5}>{stock} units in stock</Title>
+          <Title level={5}>{quantity} units in stock</Title>
 
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={24} md={24} lg={24} xl={12} xxl={12}>
@@ -73,11 +76,11 @@ function ProductCart({
 ProductCart.propTypes = {
   product: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    thumbnail: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
-    stock: PropTypes.number.isRequired,
+    quantity: PropTypes.number.isRequired,
   }).isRequired,
   handleNavigateProductDetail: PropTypes.func.isRequired,
   handleClickOrderNow: PropTypes.func.isRequired,
